@@ -4,7 +4,7 @@
   "description": "Verkefnalisti Mána server",
   "main": "index.js",
   "scripts": {
-    "start": "node ensure-users.js && node index.js",
+    "start": "node start.js",
     "dev": "nodemon index.js",
     "migrate": "node migrate.js",
     "seed": "node seed.js",

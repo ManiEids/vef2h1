@@ -121,6 +121,9 @@ dbReady.then(connected => {
   if (connected) {
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Port explicitly set to: ${port}`);
+      console.log(`Server listening at http://localhost:${port}`);
     });
   } else {
     console.error('Could not connect to database, server not started');
