@@ -4,10 +4,11 @@
   "description": "Verkefnalisti Mána server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node ensure-users.js && node index.js",
     "dev": "nodemon index.js",
     "migrate": "node migrate.js",
     "seed": "node seed.js",
+    "ensure-users": "node ensure-users.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],

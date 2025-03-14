@@ -33,11 +33,14 @@ pool.on('connect', client => {
 
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle client', err);
+  // Try to reconnect - important for long-running services
+  setTimeout(testConnection, 5000);
 });
 
 // Test database connection on startup
 async function testConnection() {
   try {
+    console.log('Testing database connection...');
     const res = await pool.query('SELECT NOW()');
     console.log('Database connected successfully, time:', res.rows[0].now);
     
@@ -45,6 +48,16 @@ async function testConnection() {
     await pool.query('CREATE SCHEMA IF NOT EXISTS h1todo');
     await pool.query('SET search_path TO h1todo, public');
     console.log('Schema h1todo verified/created');
+    
+    // Check for uploads table - it might be missing in the existing schema
+    try {
+      await pool.query(`
+        SELECT * FROM information_schema.tables
+        WHERE table_schema = 'h1todo' AND table_name = 'uploads'
+      `);
+    } catch (err) {
+      console.log('Uploads table might not exist, will attempt to use task_attachments instead');
+    }
     
     return true;
   } catch (err) {

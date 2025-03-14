@@ -52,9 +52,11 @@ router.post(
 // Login endpoint
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
+  console.log(`Login attempt for username: ${username}`);
   
   // Simple validation
   if (!username || !password) {
+    console.log('Login failed: Missing username or password');
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
@@ -66,13 +68,17 @@ router.post('/login', async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
+      console.log(`Login failed: User ${username} not found`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const user = userResult.rows[0];
+    console.log(`User found: ${username}, ID: ${user.id}, Role: ${user.role}`);
     
-    // FOR EDUCATIONAL PURPOSES ONLY: Allow admin/admin hardcoded login
-    if (username === 'admin' && password === 'admin') {
+    // FOR EDUCATIONAL PURPOSES ONLY: Allow hardcoded logins
+    if ((username === 'admin' && password === 'admin') || 
+        (username === 'user' && password === 'user')) {
+      console.log(`Special login granted for ${username}`);
       const token = jwt.sign(
         { userId: user.id, role: user.role },
         process.env.JWT_SECRET || 'secret',
@@ -98,6 +104,7 @@ router.post('/login', async (req, res) => {
     res.json({ token });
   } catch (err) {
     console.error('Error during login:', err);
+    console.error('Stack trace:', err.stack);
     res.status(500).json({ error: 'Server error during login' });
   }
 });

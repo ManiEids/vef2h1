@@ -25,6 +25,9 @@ router.get('/', [
   const offset = (page - 1) * limit;
 
   try {
+    console.log('GET /tasks - Attempting to fetch tasks');
+    console.log(`Database URL: ${process.env.DATABASE_URL ? 'is set (length: ' + process.env.DATABASE_URL.length + ')' : 'is NOT set!'}`);
+    
     // Build query conditions
     let conditions = [];
     let params = [];
@@ -107,7 +110,13 @@ router.get('/', [
     `;
 
     params.push(limit, offset);
+    
+    // Log the query we're about to run
+    console.log('Running query with params:', params);
+    console.log('Query:', tasksQuery.replace(/\s+/g, ' '));
+    
     const { rows: tasks } = await pool.query(tasksQuery, params);
+    console.log(`Retrieved ${tasks.length} tasks from database`);
 
     // Get task IDs for fetching related data
     const taskIds = tasks.map(task => task.id);
@@ -171,6 +180,7 @@ router.get('/', [
     });
   } catch (err) {
     console.error('Error fetching tasks:', err);
+    console.error('Stack trace:', err.stack);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
@@ -421,14 +431,19 @@ router.delete('/:id', authRequired, [param('id').isInt().toInt()], async (req, r
   const { id } = req.params;
   
   try {
+    console.log(`DELETE /tasks/${id} - User ${req.user.userId} attempting to delete task`);
+    
     // Verify task exists and user has permission
     const taskCheck = await pool.query('SELECT user_id FROM h1todo.tasks WHERE id = $1', [id]);
+    console.log('Task check result:', taskCheck.rows);
     
     if (taskCheck.rows.length === 0) {
+      console.log(`Task ${id} not found`);
       return res.status(404).json({ error: 'Task not found' });
     }
     
     if (taskCheck.rows[0].user_id !== req.user.userId && req.user.role !== 'admin') {
+      console.log(`Permission denied: Task owner is ${taskCheck.rows[0].user_id}, requester is ${req.user.userId} with role ${req.user.role}`);
       return res.status(403).json({ error: 'Permission denied' });
     }
 
@@ -446,6 +461,7 @@ router.delete('/:id', authRequired, [param('id').isInt().toInt()], async (req, r
       
       await client.query('COMMIT');
       
+      console.log(`Task ${id} deleted successfully`);
       res.json({ message: 'Task deleted successfully' });
     } catch (e) {
       await client.query('ROLLBACK');
@@ -454,8 +470,9 @@ router.delete('/:id', authRequired, [param('id').isInt().toInt()], async (req, r
       client.release();
     }
   } catch (err) {
-    console.error('Error deleting task:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error(`Error deleting task ${id}:`, err);
+    console.error('Stack trace:', err.stack);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
 

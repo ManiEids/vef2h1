@@ -53,35 +53,74 @@ router.post('/', authRequired, upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
+    console.log('Processing file upload:', req.file.originalname);
+    
     // Upload to Cloudinary
     const cloudinaryResult = await uploadImage(req.file.path);
+    console.log('File uploaded to Cloudinary:', cloudinaryResult.url);
     
-    // Save file info to database - using the existing uploads table
-    const { rows } = await pool.query(
-      `INSERT INTO h1todo.uploads (url, task_id)
-       VALUES ($1, $2)
-       RETURNING id, url`,
-      [
-        cloudinaryResult.url,
-        req.body.taskId || null
-      ]
-    );
+    // Save file info to database - check if uploads table exists
+    let fileId, fileUrl;
+    try {
+      // First try with uploads table (your existing schema)
+      const { rows } = await pool.query(
+        `INSERT INTO h1todo.uploads (url, task_id)
+         VALUES ($1, $2)
+         RETURNING id, url`,
+        [
+          cloudinaryResult.url,
+          req.body.taskId || null
+        ]
+      );
+      
+      fileId = rows[0].id;
+      fileUrl = rows[0].url;
+      console.log('File info saved to uploads table');
+    } catch (err) {
+      console.error('Error saving to uploads table, trying task_attachments:', err);
+      
+      // Try with task_attachments table (new schema)
+      try {
+        const { rows } = await pool.query(
+          `INSERT INTO h1todo.task_attachments (file_url, task_id, file_type, file_name, user_id)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id, file_url`,
+          [
+            cloudinaryResult.url,
+            req.body.taskId || null,
+            req.file.mimetype,
+            req.file.originalname,
+            req.user.userId
+          ]
+        );
+        
+        fileId = rows[0].id;
+        fileUrl = rows[0].file_url;
+        console.log('File info saved to task_attachments table');
+      } catch (innerErr) {
+        console.error('Error saving to task_attachments table too:', innerErr);
+        throw new Error('Could not save file information to database');
+      }
+    }
     
     // Delete the temp file
     fs.unlinkSync(req.file.path);
+    console.log('Temporary file deleted');
     
     // Return success with file URL
     res.status(201).json({
       message: 'File uploaded successfully',
-      fileId: rows[0].id,
-      fileUrl: rows[0].url
+      fileId: fileId,
+      fileUrl: fileUrl
     });
   } catch (error) {
     console.error('Error in file upload:', error);
+    console.error('Stack trace:', error.stack);
     
     // Delete the temp file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
+      console.log('Temporary file deleted after error');
     }
     
     res.status(500).json({
