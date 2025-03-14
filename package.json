@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@faker-js/faker": "^9.6.0",
+    "express-validator": "^7.2.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

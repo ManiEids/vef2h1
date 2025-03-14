@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Minimal Todo</title>
+  </head>
+  <body>
+    <h1>Minimal Todo</h1>
+    <div>
+      <label>Username:</label>
+      <input id="username" />
+      <label>Password:</label>
+      <input id="password" type="password" />
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div>
+      <h2>Create Task (Requires Auth)</h2>
+      <input id="title" placeholder="Task title" />
+      <input id="description" placeholder="Task description" />
+      <button onclick="createTask()">Create Task</button>
+    </div>
+
+    <div>
+      <h2>Tasks</h2>
+      <ul id="task-list"></ul>
+    </div>
+
+    <!-- Remove file upload section for now -->
+
+    <script src="script.js"></script>
+  </body>
+</html>
