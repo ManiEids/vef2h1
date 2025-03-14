@@ -18,7 +18,7 @@ export function authRequired(req, res, next) {
 }
 
 export function adminRequired(req, res, next) {
-  if (req.user.role !== 'admin') {
+  if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Admin only' });
   }
   return next();
