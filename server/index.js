@@ -6,8 +6,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { router as tasksRouter } from './tasks.js';
 import { router as authRouter } from './auth.js';
-import { router as uploadRouter } from './upload.js';
-import { pool } from './db.js'; // Import the database pool
+import { router as uploadRouter } from './upload.js'; 
+import { pool, dbReady } from './db.js';
 
 dotenv.config();
 
@@ -17,8 +17,24 @@ const __dirname = path.dirname(__filename);
 const publicPath = path.join(__dirname, 'public');
 
 const app = express();
-app.use(cors());
+
+// Enable CORS with options for security
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://vef2hop1manisolo.onrender.com', 'http://localhost:3000'] 
+    : 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json()); // parse JSON bodies
+
+// Security headers
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // Þjóna static skrám úr public möppu
 app.use(express.static(publicPath));
@@ -26,7 +42,7 @@ app.use(express.static(publicPath));
 // API leiðir
 app.get('/api', (req, res) => {
   res.json({
-    message: 'Hello from minimal API',
+    message: 'Verkefnalisti Mána API',
     routes: {
       tasks: '/tasks',
       auth: '/auth',
@@ -40,17 +56,19 @@ app.get('/api/db-status', async (req, res) => {
   try {
     // Test database connection
     const connectionTest = await pool.query('SELECT NOW() as now');
-    console.log('Database connection successful');
-
-    // Get user count from h1todo.users schema
+    
+    // Use your existing schema structure to count records
     const usersResult = await pool.query('SELECT COUNT(*) FROM h1todo.users');
     const userCount = parseInt(usersResult.rows[0].count, 10);
-    console.log(`User count: ${userCount}`);
 
-    // Get tasks count
     const tasksResult = await pool.query('SELECT COUNT(*) FROM h1todo.tasks');
     const taskCount = parseInt(tasksResult.rows[0].count, 10);
-    console.log(`Task count: ${taskCount}`);
+
+    const categoriesResult = await pool.query('SELECT COUNT(*) FROM h1todo.categories');
+    const categoryCount = parseInt(categoriesResult.rows[0].count, 10);
+
+    const tagsResult = await pool.query('SELECT COUNT(*) FROM h1todo.tags');
+    const tagCount = parseInt(tagsResult.rows[0].count, 10);
 
     // Return status and counts
     res.json({
@@ -58,7 +76,9 @@ app.get('/api/db-status', async (req, res) => {
       timestamp: connectionTest.rows[0].now,
       stats: {
         users: userCount,
-        tasks: taskCount
+        tasks: taskCount,
+        categories: categoryCount,
+        tags: tagCount
       }
     });
   } catch (err) {
@@ -95,6 +115,17 @@ app.use((err, req, res, next) => {
 
 // Ræsa þjón
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+
+// Wait for database to be ready before starting server
+dbReady.then(connected => {
+  if (connected) {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  } else {
+    console.error('Could not connect to database, server not started');
+    process.exit(1);
+  }
 });
+
+export { app }; // Export for testing

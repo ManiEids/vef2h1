@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo Forritið</title>
+  <title>Verkefnalisti Mána</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -22,7 +22,7 @@
     </div>
 
     <header>
-      <h1>Todo Forritið</h1>
+      <h1>Verkefnalisti Mána</h1>
     </header>
 
     <main>
@@ -71,6 +71,13 @@
         </div>
       </section>
 
+      <!-- Pagination controls -->
+      <div class="pagination">
+        <button id="prev-page" disabled>Fyrri síða</button>
+        <span id="page-info">Síða 1</span>
+        <button id="next-page">Næsta síða</button>
+      </div>
+
       <!-- Task creation form -->
       <section class="task-input">
         <h2>Nýtt verkefni</h2>
@@ -102,6 +109,11 @@
               <label for="tag-select">Tög:</label>
               <select id="tag-select" multiple></select>
             </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="task-image">Mynd:</label>
+            <input type="file" id="task-image" accept="image/jpeg, image/png">
           </div>
           
           <button type="submit">Bæta við</button>

@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: verkefnalisti-mana
+    env: node
+    buildCommand: npm ci
+    startCommand: node index.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: verkefnalisti-db
+          property: connectionString
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLOUDINARY_CLOUD_NAME
+        value: dojqamm7u
+      - key: CLOUDINARY_API_KEY
+        value: 747457427514895
+      - key: CLOUDINARY_API_SECRET
+        value: WaVUT_hAaVFNcvvfWuTKxuVDO9o
+
+databases:
+  - name: verkefnalisti-db
+    plan: free
+    databaseName: verkefnalisti
+    user: verkefnalisti_user
