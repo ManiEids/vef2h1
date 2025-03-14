@@ -17,12 +17,12 @@
           <input type="text" id="username" name="username">
           <label for="password">Lykilorð:</label>
           <input type="password" id="password" name="password">
-          <button id="login-button">Innskrá</button>
+          <button id="login-button" onclick="handleLogin()">Innskrá</button>
         </div>
         <!-- Notendaupplýsingar -->
         <div id="user-info" class="hidden">
           <span id="current-user"></span>
-          <button id="logout-button">Útskrá</button>
+          <button id="logout-button" onclick="handleLogout()">Útskrá</button>
         </div>
       </div>
     </header>
@@ -52,7 +52,7 @@
           <input type="text" id="title" name="title" required>
           <label for="description">Lýsing:</label>
           <textarea id="description" name="description"></textarea>
-          <button type="submit" onclick="createTask()">Bæta við</button>
+          <button type="submit" onclick="handleCreateTask(event)">Bæta við</button>
         </form>
       </section>
 
