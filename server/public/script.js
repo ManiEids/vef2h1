@@ -171,6 +171,38 @@ async function getDatabaseInfo() {
     }
 }
 
+// Check database connection status
+async function checkDatabaseStatus() {
+  try {
+    const response = await fetch(`${API_URL}/api/db-status`);
+    const data = await response.json();
+
+    const statusElement = document.getElementById('db-connection-status');
+    const userCount = document.getElementById('db-user-count');
+    const taskCount = document.getElementById('db-task-count');
+    const lastChecked = document.getElementById('db-last-checked');
+
+    if (data.connected) {
+      statusElement.textContent = 'Connected';
+      statusElement.className = 'connected';
+      userCount.textContent = data.stats.users;
+      taskCount.textContent = data.stats.tasks;
+      lastChecked.textContent = new Date().toLocaleTimeString();
+    } else {
+      statusElement.textContent = 'Disconnected';
+      statusElement.className = 'disconnected';
+      userCount.textContent = '-';
+      taskCount.textContent = '-';
+      lastChecked.textContent = new Date().toLocaleTimeString();
+    }
+  } catch (error) {
+    console.error('Error checking database status:', error);
+    const statusElement = document.getElementById('db-connection-status');
+    statusElement.textContent = 'Error checking connection';
+    statusElement.className = 'disconnected';
+  }
+}
+
 // Set up event listeners
 function setupEventListeners() {
     elements.loginButton.addEventListener('click', handleLogin);
@@ -186,6 +218,12 @@ function initApp() {
     setupEventListeners();
     loadTasks();
     getDatabaseInfo();
+    
+    // Check database status when page loads
+    checkDatabaseStatus();
+    
+    // Periodically check database status (every 60 seconds)
+    setInterval(checkDatabaseStatus, 60000);
 }
 
 // Run the app when the page is ready

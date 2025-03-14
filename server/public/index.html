@@ -8,6 +8,20 @@
 </head>
 <body>
   <div class="container">
+
+    <!-- Add a database connection status display at the top -->
+    <div id="db-status-panel" class="status-panel">
+      <h3>Database Status</h3>
+      <div class="status-indicator">
+        <span id="db-connection-status">Checking connection...</span>
+      </div>
+      <div class="stats">
+        <div>Users in database: <span id="db-user-count">-</span></div>
+        <div>Tasks in database: <span id="db-task-count">-</span></div>
+        <div>Last checked: <span id="db-last-checked">-</span></div>
+      </div>
+    </div>
+
     <header>
       <h1>Minimal Todo</h1>
       <!-- Innskráningarformið -->

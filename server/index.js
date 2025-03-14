@@ -35,6 +35,38 @@ app.get('/api', (req, res) => {
   });
 });
 
+// Database status endpoint
+app.get('/api/db-status', async (req, res) => {
+  try {
+    // Test database connection
+    const connectionTest = await pool.query('SELECT NOW() as now');
+
+    // Get user count
+    const usersResult = await pool.query('SELECT COUNT(*) FROM h1todo.users');
+    const userCount = parseInt(usersResult.rows[0].count, 10);
+
+    // Get tasks count
+    const tasksResult = await pool.query('SELECT COUNT(*) FROM h1todo.tasks');
+    const taskCount = parseInt(tasksResult.rows[0].count, 10);
+
+    // Return status and counts
+    res.json({
+      connected: true,
+      timestamp: connectionTest.rows[0].now,
+      stats: {
+        users: userCount,
+        tasks: taskCount
+      }
+    });
+  } catch (err) {
+    console.error('Database connection error:', err);
+    res.json({
+      connected: false,
+      error: err.message
+    });
+  }
+});
+
 // Tengja API leiðir við router
 app.use('/tasks', tasksRouter);
 app.use('/auth', authRouter);

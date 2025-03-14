@@ -220,3 +220,38 @@ button:hover {
   color: var(--secondary-color);
   padding: 20px;
 }
+
+/* Database status panel */
+.status-panel {
+  background-color: #f5f5f5;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.status-panel h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.status-indicator {
+  margin-bottom: 5px;
+}
+
+.connected {
+  color: green;
+  font-weight: bold;
+}
+
+.disconnected {
+  color: red;
+  font-weight: bold;
+}
+
+.stats {
+  font-size: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}

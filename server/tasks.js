@@ -6,58 +6,13 @@ import fs from 'fs';
 
 export const router = express.Router();
 
-async function loadInitialTasks() {
-  try {
-    // Check if the tasks table exists
-    try {
-      await pool.query('SELECT 1 FROM h1todo.tasks LIMIT 1');
-    } catch (tableErr) {
-      // If the table doesn't exist, create it
-      console.log('Tasks table does not exist, creating it...');
-      // Execute the database.sql script to create the tables
-      const fs = require('fs');
-      const databaseSql = fs.readFileSync('database.sql').toString();
-      await pool.query(databaseSql);
-      console.log('Tasks table created successfully.');
-    }
-
-    const { rows } = await pool.query('SELECT COUNT(*) FROM h1todo.tasks');
-    const taskCount = parseInt(rows[0].count, 10);
-
-    if (taskCount === 0) {
-      console.log('Loading initial tasks from data.json');
-      const rawData = fs.readFileSync('public/data/data.json');
-      const data = JSON.parse(rawData);
-
-      if (data.tasks && Array.isArray(data.tasks)) {
-        for (const task of data.tasks) {
-          await pool.query(
-            `INSERT INTO h1todo.tasks (title, description, user_id)
-             VALUES ($1, $2, $3) RETURNING *`,
-            [task.title, task.description, 1] // Assuming user_id 1 is admin
-          );
-        }
-        console.log('Initial tasks loaded successfully');
-      } else {
-        console.warn('No tasks found in data.json');
-      }
-    } else {
-      console.log('Tasks already exist in the database');
-    }
-  } catch (err) {
-    console.error('Error loading initial tasks:', err);
-  }
-}
-
-loadInitialTasks();
-
 // Sækja verkefni með síðuskiptingu
 router.get(
   '/',
   async (req, res) => {
     try {
       const { rows } = await pool.query(
-        'SELECT * FROM tasks ORDER BY id DESC'
+        'SELECT * FROM h1todo.tasks ORDER BY id DESC'
       );
 
       res.json({
@@ -83,7 +38,7 @@ router.get(
     const { id } = req.params;
 
     try {
-      const { rows } = await pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
+      const { rows } = await pool.query('SELECT * FROM h1todo.tasks WHERE id = $1', [id]);
 
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Task not found' });
@@ -115,7 +70,7 @@ router.post(
 
     try {
       const { rows } = await pool.query(
-        `INSERT INTO tasks (title, description, user_id)
+        `INSERT INTO h1todo.tasks (title, description, user_id)
          VALUES ($1, $2, $3) RETURNING *`,
         [title, description, req.user.userId]
       );
@@ -149,7 +104,7 @@ router.put(
 
     try {
       const { rows } = await pool.query(
-        `UPDATE tasks
+        `UPDATE h1todo.tasks
          SET title=$1, description=$2, completed=$3, updated_at=NOW()
          WHERE id=$4 RETURNING *`,
         [title, description, completed, id]
@@ -179,7 +134,7 @@ router.delete(
 
     const { id } = req.params;
     try {
-      const { rowCount } = await pool.query('DELETE FROM tasks WHERE id=$1', [id]);
+      const { rowCount } = await pool.query('DELETE FROM h1todo.tasks WHERE id=$1', [id]);
       if (rowCount === 0) {
         return res.status(404).json({ error: 'Task not found' });
       }
