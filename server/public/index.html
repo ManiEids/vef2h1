@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Todo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Minimal Todo</h1>
+      <div class="auth-container">
+        <div id="login-form">
+          <input type="text" id="username" placeholder="Notandanafn">
+          <input type="password" id="password" placeholder="Lykilorð">
+          <button id="login-button">Innskrá</button>
+        </div>
+        <div id="user-info" class="hidden">
+          <span id="current-user"></span>
+          <button id="logout-button">Útskrá</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="task-input">
+        <h2>Nýtt verkefni</h2>
+        <form id="task-form">
+          <input type="text" id="task-title" placeholder="Titill verkefnis" required>
+          <textarea id="task-description" placeholder="Lýsing (valfrjálst)"></textarea>
+          <button type="submit">Bæta við</button>
+        </form>
+      </section>
+
+      <section class="task-filters">
+        <h2>Sía verkefni</h2>
+        <div class="filter-options">
+          <button class="filter-btn active" data-filter="all">Ólokin</button>
+          <button class="filter-btn" data-filter="completed">Lokið</button>
+        </div>
+      </section>
+
+      <section class="tasks-list">
+        <h2>Verkefni þín</h2>
+        <div id="loading" class="loading">Hleð verkefnum...</div>
+        <div id="task-container"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
