@@ -19,3 +19,12 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export const pool = new Pool(poolConfig);
+
+// Set the search path
+pool.query('SET search_path TO h1todo, public;')
+  .then(() => {
+    console.log('Search path set to h1todo, public');
+  })
+  .catch((err) => {
+    console.error('Error setting search path:', err);
+  });
