@@ -1,19 +1,59 @@
 {
+  "users": [
+    {
+      "username": "admin",
+      "password": "adminpassword",
+      "role": "admin"
+    },
+    {
+      "username": "user",
+      "password": "userpassword",
+      "role": "user"
+    }
+  ],
   "tasks": [
     {
       "title": "Learn JavaScript",
       "description": "Study JavaScript fundamentals",
-      "completed": false
+      "completed": false,
+      "user_id": 1
     },
     {
       "title": "Build a Todo App",
       "description": "Create a basic todo application",
-      "completed": false
+      "completed": false,
+      "user_id": 1
     },
     {
       "title": "Deploy to Render",
       "description": "Deploy the todo application to Render",
-      "completed": false
+      "completed": false,
+      "user_id": 1
+    }
+  ],
+  "categories": [
+    {
+      "name": "Work",
+      "description": "Work-related tasks"
+    },
+    {
+      "name": "Personal",
+      "description": "Personal tasks"
+    },
+    {
+      "name": "Study",
+      "description": "Educational tasks"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Urgent"
+    },
+    {
+      "name": "Important"
+    },
+    {
+      "name": "Low Priority"
     }
   ]
 }

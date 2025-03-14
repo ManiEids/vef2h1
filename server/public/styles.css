@@ -29,8 +29,9 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1, h2 {
+h1, h2, h3 {
   color: #333;
+  margin-bottom: 15px;
 }
 
 header {
@@ -72,40 +73,22 @@ button:hover {
   background-color: #43a047;
 }
 
-.auth-container {
-  display: flex;
-  gap: 10px;
+section {
+  margin-bottom: 30px;
 }
 
-#login-form {
+/* Auth section */
+.auth-section {
+  margin-bottom: 20px;
+}
+
+.auth-form {
   display: flex;
   gap: 10px;
 }
 
 /* Task Input */
 .task-input {
-  margin-bottom: 20px;
-}
-
-.task-input input[type="text"],
-.task-input textarea {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.task-input button {
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.task-input, .task-filters {
   margin-bottom: 20px;
   padding: 15px;
   background-color: var(--light-gray);
@@ -116,6 +99,19 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+#task-form input,
+#task-form textarea {
+  width: 100%;
+}
+
+/* Task filters */
+.task-filters {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: var(--light-gray);
+  border-radius: 4px;
 }
 
 .filter-options {
@@ -135,21 +131,13 @@ button:hover {
 }
 
 /* Task List */
-.tasks-list {
+.tasks-container {
   margin-top: 20px;
 }
 
-.tasks-list ul {
+#tasks-list {
   list-style: none;
   padding: 0;
-}
-
-.tasks-list li {
-  padding: 10px;
-  margin-bottom: 5px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #f8f9fa;
 }
 
 .task-item {
@@ -164,6 +152,9 @@ button:hover {
 
 .task-item.completed {
   opacity: 0.7;
+}
+
+.task-item.completed .task-title {
   text-decoration: line-through;
 }
 
@@ -186,39 +177,38 @@ button:hover {
   gap: 5px;
 }
 
-/* Navigation */
-.navigation ul {
-  list-style: none;
-  padding: 0;
+.toggle-btn {
+  background-color: #2196F3;
 }
 
-.navigation li {
-  margin-bottom: 5px;
-}
-
-.navigation a {
-  display: block;
-  padding: 8px 12px;
-  text-decoration: none;
-  color: #007bff;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.navigation a:hover {
-  background-color: #e9ecef;
+.delete-btn {
+  background-color: #f44336;
 }
 
 /* States */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
-.loading {
+#loading-state {
   text-align: center;
   color: var(--secondary-color);
   padding: 20px;
+}
+
+#error-state {
+  text-align: center;
+  color: #f44336;
+  padding: 20px;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
+#empty-state {
+  text-align: center;
+  color: var(--secondary-color);
+  padding: 20px;
+  font-style: italic;
 }
 
 /* Database status panel */
@@ -226,17 +216,12 @@ button:hover {
   background-color: #f5f5f5;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 10px;
+  padding: 15px;
   margin-bottom: 20px;
 }
 
-.status-panel h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
 .status-indicator {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .connected {
@@ -250,8 +235,18 @@ button:hover {
 }
 
 .stats {
-  font-size: 0.9rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 10px;
+  font-size: 14px;
+}
+
+/* Footer */
+footer {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--secondary-color);
+  font-size: 14px;
 }

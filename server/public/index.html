@@ -8,8 +8,7 @@
 </head>
 <body>
   <div class="container">
-
-    <!-- Add a database connection status display at the top -->
+    <!-- Database connection status -->
     <div id="db-status-panel" class="status-panel">
       <h3>Database Status</h3>
       <div class="status-indicator">
@@ -24,79 +23,68 @@
 
     <header>
       <h1>Minimal Todo</h1>
-      <!-- Innskráningarformið -->
-      <div class="auth-container">
-        <div id="login-form">
-          <label for="username">Notandanafn:</label>
-          <input type="text" id="username" name="username">
-          <label for="password">Lykilorð:</label>
-          <input type="password" id="password" name="password">
-          <button id="login-button" onclick="handleLogin()">Innskrá</button>
-        </div>
-        <!-- Notendaupplýsingar -->
-        <div id="user-info" class="hidden">
-          <span id="current-user"></span>
-          <button id="logout-button" onclick="handleLogout()">Útskrá</button>
-        </div>
-      </div>
     </header>
 
     <main>
-      <!-- Valmynd -->
-      <nav class="navigation">
-        <ul>
-          <li><a href="#" data-filter="all" id="all-tasks">Verkefni (<span id="all-count">0</span>)</a></li>
-          <li><a href="#" data-filter="completed" id="completed-tasks">Kláruð verkefni (<span id="completed-count">0</span>)</a></li>
-          <li>
-            Flokkar
-            <ul id="categories-list"></ul>
-          </li>
-          <li>
-            Tags
-            <ul id="tags-list"></ul>
-          </li>
-        </ul>
-      </nav>
+      <!-- Auth section -->
+      <section class="auth-section">
+        <div id="login-form" class="auth-form">
+          <input type="text" id="username" placeholder="Notandanafn">
+          <input type="password" id="password" placeholder="Lykilorð">
+          <button id="login-button">Innskrá</button>
+        </div>
+        <div id="userInfo" class="user-info hidden">
+          <span id="currentUser"></span>
+          <button id="logout-button">Útskrá</button>
+        </div>
+      </section>
 
-      <!-- Form til að búa til verkefni -->
+      <!-- Task filters -->
+      <section class="task-filters">
+        <div class="filter-options">
+          <button class="filter-btn active" data-filter="all">Verkefni (<span id="all-count">0</span>)</button>
+          <button class="filter-btn" data-filter="completed">Kláruð verkefni (<span id="completed-count">0</span>)</button>
+        </div>
+        
+        <div class="categories">
+          <h3>Flokkar</h3>
+          <ul id="categories-list"></ul>
+        </div>
+
+        <div class="tags">
+          <h3>Tags</h3>
+          <ul id="tags-list"></ul>
+        </div>
+      </section>
+
+      <!-- Task creation form -->
       <section class="task-input">
         <h2>Nýtt verkefni</h2>
         <form id="task-form">
-          <label for="title">Titill:</label>
-          <input type="text" id="title" name="title" required>
-          <label for="description">Lýsing:</label>
-          <textarea id="description" name="description"></textarea>
-          <button type="submit" onclick="handleCreateTask(event)">Bæta við</button>
+          <input type="text" id="title" placeholder="Titill" required>
+          <textarea id="description" placeholder="Lýsing"></textarea>
+          <button type="submit">Bæta við</button>
         </form>
       </section>
 
-      <!-- Verkefnalisti -->
-      <section class="tasks-list">
+      <!-- Task display -->
+      <section class="tasks-container">
         <h2>Verkefni þín</h2>
-        <div id="loading-state" class="hidden">Sæki verkefni...</div>
-        <div id="error-state" class="hidden">Villa kom upp við að sækja verkefni. <button id="retry-button" onclick="loadTasks()">Reyna aftur</button></div>
-        <div id="empty-state" class="hidden">Engin verkefni til að sýna.</div>
+        <div id="loading-state">Sæki verkefni...</div>
+        <div id="error-state" class="hidden">
+          Villa kom upp við að sækja verkefni
+          <button id="retry-button">Reyna aftur</button>
+        </div>
+        <div id="empty-state" class="hidden">Engin verkefni til að sýna</div>
         <ul id="tasks-list"></ul>
       </section>
     </main>
 
     <footer>
-      <div id="db-info">
-        <p>Notendur: <span id="user-count">0</span></p>
-        <p>Verkefni: <span id="task-count">0</span></p>
-      </div>
+      <p>Notendur: <span id="user-count">0</span> | Verkefni: <span id="task-count">0</span></p>
     </footer>
   </div>
 
   <script src="script.js"></script>
-  <script>
-    // Simple error handler to catch any script loading issues
-    window.onerror = function(message, source, lineno, colno, error) {
-      console.error('Script error:', message, source, error);
-      document.getElementById('db-connection-status').textContent = 'Script error: ' + message;
-      document.getElementById('db-connection-status').className = 'disconnected';
-      return true;
-    };
-  </script>
 </body>
 </html>
