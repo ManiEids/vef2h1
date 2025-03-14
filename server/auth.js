@@ -86,6 +86,14 @@ router.post('/login', async (req, res) => {
 // Sækja fjölda notenda
 router.get('/users', async (req, res) => {
   try {
+    // Check if the users table exists
+    try {
+      await pool.query('SELECT 1 FROM h1todo.users LIMIT 1');
+    } catch (tableErr) {
+      // If the table doesn't exist, return 0
+      console.log('Users table does not exist');
+      return res.json({ count: 0 });
+    }
     const { rows } = await pool.query('SELECT COUNT(*) FROM h1todo.users');
     const count = parseInt(rows[0].count, 10);
     return res.json({ count });
