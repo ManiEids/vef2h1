@@ -3,26 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Minimal Todo</title>
+  <title>Todo Forritið</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="container">
     <!-- Database connection status -->
     <div id="db-status-panel" class="status-panel">
-      <h3>Database Status</h3>
+      <h3>Gagnagrunnur</h3>
       <div class="status-indicator">
-        <span id="db-connection-status">Checking connection...</span>
+        <span id="db-connection-status">Athuga tengingu...</span>
       </div>
       <div class="stats">
-        <div>Users in database: <span id="db-user-count">-</span></div>
-        <div>Tasks in database: <span id="db-task-count">-</span></div>
-        <div>Last checked: <span id="db-last-checked">-</span></div>
+        <div>Notendur: <span id="db-user-count">-</span></div>
+        <div>Verkefni: <span id="db-task-count">-</span></div>
+        <div>Síðast athugað: <span id="db-last-checked">-</span></div>
       </div>
     </div>
 
     <header>
-      <h1>Minimal Todo</h1>
+      <h1>Todo Forritið</h1>
     </header>
 
     <main>
@@ -45,6 +45,20 @@
           <button class="filter-btn active" data-filter="all">Verkefni (<span id="all-count">0</span>)</button>
           <button class="filter-btn" data-filter="completed">Kláruð verkefni (<span id="completed-count">0</span>)</button>
         </div>
+
+        <div class="search-container">
+          <input type="text" id="search-input" placeholder="Leita að verkefni">
+        </div>
+
+        <div class="sort-container">
+          <label for="sort-select">Raða eftir:</label>
+          <select id="sort-select">
+            <option value="newest">Nýjast fyrst</option>
+            <option value="oldest">Elst fyrst</option>
+            <option value="priority">Forgangur</option>
+            <option value="dueDate">Skiladagur</option>
+          </select>
+        </div>
         
         <div class="categories">
           <h3>Flokkar</h3>
@@ -52,7 +66,7 @@
         </div>
 
         <div class="tags">
-          <h3>Tags</h3>
+          <h3>Tög</h3>
           <ul id="tags-list"></ul>
         </div>
       </section>
@@ -63,6 +77,33 @@
         <form id="task-form">
           <input type="text" id="title" placeholder="Titill" required>
           <textarea id="description" placeholder="Lýsing"></textarea>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="due-date">Skiladagur:</label>
+              <input type="date" id="due-date">
+            </div>
+            <div class="form-group">
+              <label for="priority">Forgangur:</label>
+              <select id="priority">
+                <option value="1">Hár</option>
+                <option value="2" selected>Miðlungs</option>
+                <option value="3">Lágur</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="category-select">Flokkur:</label>
+              <select id="category-select"></select>
+            </div>
+            <div class="form-group">
+              <label for="tag-select">Tög:</label>
+              <select id="tag-select" multiple></select>
+            </div>
+          </div>
+          
           <button type="submit">Bæta við</button>
         </form>
       </section>

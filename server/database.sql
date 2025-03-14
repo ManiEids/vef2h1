@@ -1,3 +1,6 @@
+-- Create schema
+CREATE SCHEMA IF NOT EXISTS h1todo;
+
 -- Set schema
 SET search_path TO h1todo, public;
 
@@ -14,10 +17,10 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password_hash VARCHAR(200) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(20) DEFAULT 'user' NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Categories table - create before tasks that reference it
@@ -25,30 +28,32 @@ CREATE TABLE IF NOT EXISTS categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    color VARCHAR(7) DEFAULT '#6c757d',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Tags table - create before task_tags that references it
 CREATE TABLE IF NOT EXISTS tags (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    color VARCHAR(7) DEFAULT '#6c757d',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Tasks table - depends on users and categories
 CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(100) NOT NULL,
     description TEXT,
     completed BOOLEAN DEFAULT FALSE,
-    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
-    due_date TIMESTAMP,
-    priority INTEGER DEFAULT 3, -- 1 High, 2 Medium, 3 Low
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    due_date TIMESTAMP WITH TIME ZONE,
+    priority INTEGER DEFAULT 2, -- 1 High, 2 Medium, 3 Low
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Task Categories (Many-to-Many relationship)
@@ -89,23 +94,23 @@ VALUES ('admin', '$2b$10$SAMPLE_HASH_TO_BE_REPLACED', 'admin')
 ON CONFLICT (username) DO NOTHING;
 
 -- Add some basic categories
-INSERT INTO categories (name, description)
+INSERT INTO categories (name, description, color)
 VALUES 
-  ('Work', 'Work-related tasks'),
-  ('Personal', 'Personal tasks'),
-  ('Study', 'Educational tasks'),
-  ('Health', 'Health-related tasks'),
-  ('Home', 'House chores and maintenance')
+  ('Work', 'Work-related tasks', '#0275d8'),
+  ('Personal', 'Personal tasks', '#5cb85c'),
+  ('Study', 'Educational tasks', '#f0ad4e'),
+  ('Health', 'Health-related tasks', '#d9534f'),
+  ('Home', 'House chores and maintenance', '#6c757d')
 ON CONFLICT (name) DO NOTHING;
 
 -- Add some basic tags
-INSERT INTO tags (name)
+INSERT INTO tags (name, color)
 VALUES 
-  ('Urgent'),
-  ('Important'),
-  ('Low Priority'),
-  ('Meeting'),
-  ('Deadline')
+  ('Urgent', '#dc3545'),
+  ('Important', '#007bff'),
+  ('Low Priority', '#fd7e14'),
+  ('Meeting', '#28a745'),
+  ('Deadline', '#17a2b8')
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert some sample tasks

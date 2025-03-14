@@ -1,27 +1,26 @@
 import jwt from 'jsonwebtoken';
 
-// Middleware til að athuga hvort notandi sé innskráður
-export function authRequired(req, res, next) {
-  const header = req.headers.authorization || '';
-  const [type, token] = header.split(' ');
+export const authRequired = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (type !== 'Bearer' || !token) {
-    return res.status(401).json({ error: 'Missing or invalid token' });
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Authentication required' });
   }
+
+  const token = authHeader.split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     req.user = decoded;
-    return next();
+    next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.status(401).json({ error: 'Invalid token' });
   }
-}
+};
 
-// Middleware til að athuga hvort notandi sé stjórnandi
-export function adminRequired(req, res, next) {
+export const adminRequired = (req, res, next) => {
   if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin only' });
+    return res.status(403).json({ error: 'Admin privileges required' });
   }
-  return next();
-}
+  next();
+};
