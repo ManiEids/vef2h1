@@ -109,9 +109,9 @@ VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert some sample tasks
+-- Removed "ON CONFLICT (title) DO NOTHING" because "title" is not unique
 INSERT INTO tasks (title, description, user_id)
 VALUES
   ('Learn JavaScript', 'Study JavaScript fundamentals', 1),
   ('Build a Todo App', 'Create a basic todo application', 1),
-  ('Deploy to Render', 'Deploy the todo application to Render', 1)
-ON CONFLICT (title) DO NOTHING;
+  ('Deploy to Render', 'Deploy the todo application to Render', 1);
