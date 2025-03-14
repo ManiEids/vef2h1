@@ -1,17 +1,17 @@
-// Fyrir þróun, notað localhost
+// Fronta kóði fyrir verkefnalista - Client side code
+
+// API slóð - vafri tengist þessu URL
 const API_URL = 'https://vef2hop1manisolo.onrender.com';
 
-// Fyrir framleiðslu, notaðu Render vefþjóninn
-// const API_URL = 'https://your-backend-name.onrender.com';
-
+// Token til að geyma milli HTTP beiðna
 let token = null;
 
-// Innskráning notanda
+// Innskráninga fall - fyrir notendatengingu
 async function login() {
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
   
-  // Senda innskráningarbeiðni
+  // Senda innskráningarbeiðni á bakenda
   const res = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -28,7 +28,7 @@ async function login() {
   }
 }
 
-// Sækja öll verkefni
+// Sækja öll verkefni - þarf ekki að vera innskráður
 async function getTasks() {
   const res = await fetch(`${API_URL}/tasks`);
   const data = await res.json();
@@ -43,6 +43,7 @@ async function getTasks() {
       list.appendChild(li);
     });
   } else if (Array.isArray(data)) {
+    // Eldra format
     data.forEach((t) => {
       const li = document.createElement('li');
       li.textContent = `${t.title} - completed: ${t.completed ? 'Yes' : 'No'}`;
@@ -51,7 +52,7 @@ async function getTasks() {
   }
 }
 
-// Búa til nýtt verkefni
+// Búa til nýtt verkefni - þarf að vera innskráður
 async function createTask() {
   if (!token) {
     alert('Login first');
@@ -61,7 +62,7 @@ async function createTask() {
   const title = document.getElementById('title').value;
   const description = document.getElementById('description').value;
   
-  // Senda beiðni um að búa til nýtt verkefni
+  // Senda beiðni á bakenda
   const res = await fetch(`${API_URL}/tasks`, {
     method: 'POST',
     headers: {
@@ -80,8 +81,9 @@ async function createTask() {
   }
 }
 
+// Uppsetning við DOMContentLoadedsername');
 document.addEventListener('DOMContentLoaded', function() {
-  // Default login values for educational purposes
+  // Sjálfgefið
   const usernameField = document.getElementById('username');
   const passwordField = document.getElementById('password');
   
@@ -89,6 +91,4 @@ document.addEventListener('DOMContentLoaded', function() {
     usernameField.value = 'admin';
     passwordField.value = 'admin';
   }
-  
-  // Rest of your initialization code
 });

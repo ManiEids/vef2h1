@@ -1,18 +1,24 @@
+# Render þjónustu uppsetning - Fyrir sjálfvirka uppsetningu
+
 services:
+  # Vefþjónn fyrir verkefnalistann
   - type: web
     name: verkefnalisti-mana
     env: node
     buildCommand: npm ci
     startCommand: node index.js
     envVars:
+      # Tengja við gagnagrunninn
       - key: DATABASE_URL
         fromDatabase:
           name: verkefnalisti-db
           property: connectionString
+      # Aðrar umhverfisbreytur
       - key: NODE_ENV
         value: production
       - key: JWT_SECRET
         generateValue: true
+      # Cloudinary stillingar fyrir myndir
       - key: CLOUDINARY_CLOUD_NAME
         value: dojqamm7u
       - key: CLOUDINARY_API_KEY
@@ -20,6 +26,7 @@ services:
       - key: CLOUDINARY_API_SECRET
         value: WaVUT_hAaVFNcvvfWuTKxuVDO9o
 
+# Gagnagrunnurinn
 databases:
   - name: verkefnalisti-db
     plan: free

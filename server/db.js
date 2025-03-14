@@ -1,3 +1,4 @@
+// Gagnagrunnstengingar - Database connections
 import pkg from 'pg';
 import dotenv from 'dotenv';
 
@@ -6,20 +7,20 @@ dotenv.config();
 const { Pool } = pkg;
 
 const isProduction = process.env.NODE_ENV === 'production';
-console.log(`Environment: ${isProduction ? 'production' : 'development'}`);
-console.log('Database URL:', process.env.DATABASE_URL ? 'is set' : 'is not set');
+console.log(`Umhverfi: ${isProduction ? 'production' : 'development'}`);
+console.log('Database URL:', process.env.DATABASE_URL ? 'er stillt' : 'er ekki stillt');
 
-// Production settings for Render's PostgreSQL
+// Stillingar fyrir PostgreSQL á Render
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: isProduction ? { rejectUnauthorized: false } : false,
-  // Add some connection resilience
-  max: 20,               // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // How long a client is allowed to remain idle
-  connectionTimeoutMillis: 10000, // How long to wait for a connection
+  // Bæta við seiglu í tengingum
+  max: 20,               // Hámarksfjöldi tenginga í pool
+  idleTimeoutMillis: 30000, // Hversu lengi tenging má vera idle
+  connectionTimeoutMillis: 10000, // Hversu lengi að bíða eftir tengingu
 });
 
-// Set schema path for every new connection
+// Setja schema path fyrir hverja nýja tengingu
 pool.on('connect', client => {
   client.query('SET search_path TO h1todo, public', (err) => {
     if (err) {
@@ -28,43 +29,43 @@ pool.on('connect', client => {
       console.log('Schema path set to: h1todo, public');
     }
   });
-  console.log('New database connection established');
+  console.log('Ný gagnagrunnstenging stofnuð');
 });
 
 pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client', err);
-  // Try to reconnect - important for long-running services
+  console.error('Villa á idle client:', err);
+  // Reyna að tengjast aftur - mikilvægt fyrir langtíma notkun
   setTimeout(testConnection, 5000);
 });
 
-// Test database connection on startup
+// Prófa gagnagrunntengingu við ræsingu
 async function testConnection() {
   try {
-    console.log('Testing database connection...');
+    console.log('Prófa gagnagrunntengingu...');
     const res = await pool.query('SELECT NOW()');
-    console.log('Database connected successfully, time:', res.rows[0].now);
+    console.log('Database tengdur, tími:', res.rows[0].now);
     
-    // Verify schema exists or create it
+    // Athuga hvort schema er til eða búa það til
     await pool.query('CREATE SCHEMA IF NOT EXISTS h1todo');
     await pool.query('SET search_path TO h1todo, public');
-    console.log('Schema h1todo verified/created');
+    console.log('Schema h1todo staðfest/búið til');
     
-    // Check for uploads table - it might be missing in the existing schema
+    // Athuga hvort uploads tafla er til
     try {
       await pool.query(`
         SELECT * FROM information_schema.tables
         WHERE table_schema = 'h1todo' AND table_name = 'uploads'
       `);
     } catch (err) {
-      console.log('Uploads table might not exist, will attempt to use task_attachments instead');
+      console.log('Uploads taflan er ekki til, nota task_attachments í staðinn');
     }
     
     return true;
   } catch (err) {
-    console.error('Database connection error:', err);
+    console.error('Database tengivilla:', err);
     return false;
   }
 }
 
-// Export the connection test so it can be used by other modules
+// Export connection test til nota í öðrum modules
 export const dbReady = testConnection();

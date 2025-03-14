@@ -1,3 +1,4 @@
+// Gagnaseðill - Fylla gagnagrunn með prufugögnum fyrir þróun
 import { faker } from '@faker-js/faker/locale/is';
 import bcrypt from 'bcrypt';
 import { pool } from './db.js';
@@ -14,7 +15,7 @@ async function seed() {
   try {
     await client.query('BEGIN');
 
-    // Create users (10 users + admin)
+    // Búa til notendur (10 notendur + admin)
     console.log('Creating users...');
     const users = [];
     for (let i = 0; i < 10; i++) {
@@ -30,7 +31,7 @@ async function seed() {
       users.push(rows[0].id);
     }
 
-    // Create additional categories (5 existing + 5 new = 10)
+    // Búa til flokka (5 til + 5 nýir = 10)
     console.log('Creating categories...');
     const categories = [];
     for (let i = 0; i < 5; i++) {
@@ -54,7 +55,7 @@ async function seed() {
     );
     existingCategories.forEach(cat => categories.push(cat.id));
 
-    // Create additional tags (5 existing + 5 new = 10)
+    // Búa til tags (5 til + 5 ný = 10)
     console.log('Creating tags...');
     const tags = [];
     for (let i = 0; i < 5; i++) {
@@ -77,7 +78,7 @@ async function seed() {
     );
     existingTags.forEach(tag => tags.push(tag.id));
 
-    // Create tasks (35)
+    // Búa til verkefni (35)
     console.log('Creating tasks...');
     const tasks = [];
     for (let i = 0; i < 35; i++) {
@@ -100,7 +101,7 @@ async function seed() {
       tasks.push(rows[0].id);
     }
 
-    // Assign tags to tasks
+    // Tengja tags við verkefni
     console.log('Assigning tags to tasks...');
     for (const taskId of tasks) {
       // Assign 1-3 random tags to each task
@@ -116,7 +117,7 @@ async function seed() {
       }
     }
 
-    // Create comments (50)
+    // Búa til athugasemdir (50)
     console.log('Creating comments...');
     for (let i = 0; i < 50; i++) {
       const taskId = tasks[Math.floor(Math.random() * tasks.length)];
@@ -133,7 +134,7 @@ async function seed() {
       );
     }
 
-    // Create task history entries (30)
+    // Búa til verkefnasögu (30)
     console.log('Creating task history...');
     for (let i = 0; i < 30; i++) {
       const taskId = tasks[Math.floor(Math.random() * tasks.length)];
@@ -156,7 +157,7 @@ async function seed() {
     await client.query('COMMIT');
     console.log('Database seeded successfully!');
     
-    // Count records in each table
+    // Telja færslur í hverri töflu
     const counts = await countRecords(client);
     console.log('Record counts:', counts);
     
@@ -168,6 +169,7 @@ async function seed() {
   }
 }
 
+// Hjálparfall til að telja færslur
 async function countRecords(client) {
   const tables = [
     'users', 'categories', 'tags', 'tasks', 

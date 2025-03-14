@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Add stars container before the main container -->
+  <div class="stars" id="stars"></div>
+  
   <div class="container">
     <!-- Database connection status -->
     <div id="db-status-panel" class="status-panel">
@@ -138,6 +141,40 @@
     </footer>
   </div>
 
+  <!-- Add star generation script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Create stars
+      const starsContainer = document.getElementById('stars');
+      const starCount = 100;
+      
+      for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        const size = Math.random();
+        
+        if (size < 0.6) {
+          star.className = 'star small';
+        } else if (size < 0.9) {
+          star.className = 'star medium';
+        } else {
+          star.className = 'star large';
+        }
+        
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 10}s`;
+        
+        starsContainer.appendChild(star);
+      }
+      
+      // Set unique animation delay for tasks to create floating effect
+      const tasks = document.querySelectorAll('.task-item');
+      tasks.forEach((task, index) => {
+        task.style.setProperty('--animation-order', index);
+      });
+    });
+  </script>
+  
   <script src="script.js"></script>
 </body>
 </html>

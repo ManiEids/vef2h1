@@ -1,18 +1,19 @@
+// Tryggja að notendur séu til - Ensure default users exist
 import { pool } from './db.js';
 
-// Password hash for 'admin' and 'user' passwords
+// Password hash fyrir 'admin' og 'user' passwords (bæði er 'admin')
 const PASSWORD_HASH = '$2b$10$7TxahHgzQi2MvV5ktj5qkO7PQPkJImjcKuIci96bA2pZVC4CsvKju';
 
 async function ensureUsers() {
-  console.log('Ensuring default users exist...');
+  console.log('Tryggja að sjálfgefnir notendur séu til...');
   const client = await pool.connect();
 
   try {
-    // Create schema if it doesn't exist
+    // Búa til schema ef það er ekki til
     await client.query('CREATE SCHEMA IF NOT EXISTS h1todo');
     await client.query('SET search_path TO h1todo, public');
     
-    // Check if users table exists, if not, this script can't proceed
+    // Athuga hvort users tafla er til
     const { rows: tableExists } = await client.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -22,41 +23,42 @@ async function ensureUsers() {
     `);
     
     if (!tableExists[0].exists) {
-      console.log('Users table does not exist. Run migration first.');
+      console.log('Users tafla er ekki til. Keyrðu migrate fyrst.');
       return;
     }
     
-    // Add admin user if it doesn't exist
+    // Bæta við admin notanda ef hann er ekki til
     await client.query(`
       INSERT INTO h1todo.users (username, password_hash, role, email)
       VALUES ('admin', $1, 'admin', 'admin@example.com')
       ON CONFLICT (username) DO NOTHING
     `, [PASSWORD_HASH]);
     
-    // Add regular user if it doesn't exist
+    // Bæta við venjulegum notanda ef hann er ekki til
     await client.query(`
       INSERT INTO h1todo.users (username, password_hash, role, email)
       VALUES ('user', $1, 'user', 'user@example.com')
       ON CONFLICT (username) DO NOTHING
     `, [PASSWORD_HASH]);
     
-    // Check users
+    // Athuga hverjir eru til
     const { rows: users } = await client.query(`
       SELECT id, username, role FROM h1todo.users WHERE username IN ('admin', 'user')
     `);
     
-    console.log('Users in database:', users);
-    console.log('Default users created or already exist');
+    console.log('Notendur í gagnagrunni:', users);
+    console.log('Sjálfgefnir notendur búnir til eða eru nú þegar til');
   } catch (err) {
-    console.error('Error creating default users:', err);
+    console.error('Villa við að búa til sjálfgefna notendur:', err);
   } finally {
     client.release();
   }
 }
 
+// Keyra fallið
 ensureUsers()
   .then(() => {
-    console.log('Script complete');
+    console.log('Script lokið');
     process.exit(0);
   })
   .catch(err => {

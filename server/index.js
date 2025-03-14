@@ -1,4 +1,4 @@
-// server/index.js
+// Main server file - Aðalskrá fyrir vefþjónn
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -18,7 +18,7 @@ const publicPath = path.join(__dirname, 'public');
 
 const app = express();
 
-// Enable CORS with options for security
+// CORS stillingar - mikilvægt fyrir öryggi
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://vef2hop1manisolo.onrender.com', 'http://localhost:3000'] 
@@ -27,9 +27,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json()); // parse JSON bodies
+app.use(express.json()); // parse JSON bodies - þýða JSON body
 
-// Security headers
+// Öryggis headers - security stuff
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
   res.set('X-XSS-Protection', '1; mode=block');
@@ -39,7 +39,7 @@ app.use((req, res, next) => {
 // Þjóna static skrám úr public möppu
 app.use(express.static(publicPath));
 
-// API leiðir
+// API routes - vefþjónustur
 app.get('/api', (req, res) => {
   res.json({
     message: 'Verkefnalisti Mána API',
@@ -51,13 +51,13 @@ app.get('/api', (req, res) => {
   });
 });
 
-// Database status endpoint
+// Database status endpoint - Gagnagrunns-status
 app.get('/api/db-status', async (req, res) => {
   try {
-    // Test database connection
+    // Test database connection - Tékka á gagnagrunns-tengingu
     const connectionTest = await pool.query('SELECT NOW() as now');
     
-    // Use your existing schema structure to count records
+    // Nota núverandi schema struktur til að telja færslur
     const usersResult = await pool.query('SELECT COUNT(*) FROM h1todo.users');
     const userCount = parseInt(usersResult.rows[0].count, 10);
 
@@ -90,22 +90,22 @@ app.get('/api/db-status', async (req, res) => {
   }
 });
 
-// Tengja API leiðir við router
+// API leiðir - tengja við routers
 app.use('/tasks', tasksRouter);
 app.use('/auth', authRouter);
 app.use('/upload', uploadRouter);
 
-// 404 villumeðhöndlun fyrir API leiðir
+// 404 villa fyrir API leiðir
 app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// Beina öllum öðrum beiðnum á index.html (fyrir SPA)
+// SPA route - fyrir framenda
 app.get('*', (req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// Almenn villumeðhöndlun
+// Global error handling - Almenn villumeðhöndlun
 app.use((err, req, res, next) => {
   console.error(err.stack);
   if (!res.headersSent) {
@@ -113,10 +113,10 @@ app.use((err, req, res, next) => {
   }
 });
 
-// Ræsa þjón
+// Käyrä þjón - en bara ef gagnagrunnur er tengdur
 const port = process.env.PORT || 3000;
 
-// Wait for database to be ready before starting server
+// Bíða eftir að db sé ready áður en við startum server
 dbReady.then(connected => {
   if (connected) {
     app.listen(port, () => {
@@ -131,4 +131,4 @@ dbReady.then(connected => {
   }
 });
 
-export { app }; // Export for testing
+export { app }; // Export fyrir testing

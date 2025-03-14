@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Update pagination controls
+  
   function updatePagination(currentPage, totalPages) {
     elements.pageInfo.textContent = `Síða ${currentPage} af ${totalPages}`;
     
@@ -665,18 +665,18 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.nextPageBtn.disabled = currentPage >= totalPages;
   }
   
-  // Set up search functionality
+  
   function setupSearch() {
     if (!elements.searchInput) return;
     
     elements.searchInput.addEventListener('input', debounce(() => {
       searchTerm = elements.searchInput.value.trim().toLowerCase();
-      currentPage = 1; // Reset to first page when searching
+      currentPage = 1; // resetta fyrstu síðu
       loadTasks();
-    }, 500)); // Debounce for 500ms to avoid too many requests
+    }, 500)); // 500ms ef mörg request
   }
   
-  // Set up sorting
+  // sorting
   function setupSorting() {
     if (!elements.sortSelect) return;
     
@@ -686,7 +686,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Set up pagination buttons
+  // skella í pagination
   function setupPagination() {
     if (elements.prevPageBtn) {
       elements.prevPageBtn.addEventListener('click', () => {
@@ -707,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Utility debounce function for search
+  // setja debounce
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -722,7 +722,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Set up event listeners
   function setupEventListeners() {
-    // Attach event listeners only if elements exist
+    // event listenar
     if (elements.loginButton) {
       elements.loginButton.addEventListener('click', handleLogin);
     }
@@ -739,17 +739,17 @@ document.addEventListener('DOMContentLoaded', function() {
       elements.retryButton.addEventListener('click', loadTasks);
     }
     
-    // Filter buttons
+    // takkar
     elements.filterButtons.forEach(btn => {
       btn.addEventListener('click', () => filterTasks(btn.getAttribute('data-filter')));
     });
   }
   
-  // Initialize the app
+  // Initialize 
   function initApp() {
     checkAuthStatus();
     
-    // Default login values for educational purposes
+    // Default login 
     if (elements.username && elements.password) {
       elements.username.value = 'admin';
       elements.password.value = 'admin';
@@ -760,20 +760,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSearch();
     setupSorting();
     setupPagination();
-    
-    // Load tasks
     loadTasks();
-    
-    // Check database status
     checkDatabaseStatus();
     setInterval(checkDatabaseStatus, 30000);
   }
   
-  // Run the app
+  // Run 
   initApp();
 });
 
-// Handle file upload separately if needed
+
 async function uploadTaskImage(taskId, fileInput) {
   if (!fileInput.files || fileInput.files.length === 0) {
     return null;

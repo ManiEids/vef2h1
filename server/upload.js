@@ -1,3 +1,4 @@
+// Mynda uploadari - Handles file uploads
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
@@ -9,30 +10,31 @@ import { pool } from './db.js';
 
 export const router = express.Router();
 
-// Configure multer for file uploads
+// Stilla multer fyrir file uploads
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, 'temp-uploads');
 
-// Create uploads directory if it doesn't exist
+// Búa til uploads directory ef það er ekki til
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Configure multer storage
+// Stilla multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
+    // Búa til einkvæmt filename
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const extension = path.extname(file.originalname);
     cb(null, file.fieldname + '-' + uniqueSuffix + extension);
   }
 });
 
-// Filter to only accept images
+// Filter, bara myndir leyfðar
 const fileFilter = (req, file, cb) => {
-  // Accept only jpg/jpeg and png
+  // Bara JPG og PNG eru leyfð
   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
     cb(null, true);
   } else {
@@ -40,29 +42,40 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// Multer með stærðartakmörkunum
 const upload = multer({ 
   storage, 
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+  limits: { 
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+    files: 1 // Bara ein mynd í einu
+  }
 });
 
-// Upload image and save to Cloudinary
+// Hlaða upp mynd og vista á Cloudinary
 router.post('/', authRequired, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    console.log('Processing file upload:', req.file.originalname);
+    console.log('Vinna með file upload:', req.file.originalname, `(${req.file.size} bytes)`);
     
-    // Upload to Cloudinary
+    // Athuga stærð aftur, max 10MB
+    if (req.file.size > 10 * 1024 * 1024) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'File too large. Maximum file size is 10MB.' });
+    }
+    
+    // Upload á Cloudinary með resize
     const cloudinaryResult = await uploadImage(req.file.path);
-    console.log('File uploaded to Cloudinary:', cloudinaryResult.url);
+    console.log('Mynd hlaðið upp á Cloudinary:', cloudinaryResult.url);
+    console.log(`Resized to ${cloudinaryResult.width}x${cloudinaryResult.height}, format: ${cloudinaryResult.format}, size: ${cloudinaryResult.bytes} bytes`);
     
-    // Save file info to database - check if uploads table exists
+    // Vista upplýsingar í gagnagrunn
     let fileId, fileUrl;
     try {
-      // First try with uploads table (your existing schema)
+      // First try with uploads table (existing schema)
       const { rows } = await pool.query(
         `INSERT INTO h1todo.uploads (url, task_id)
          VALUES ($1, $2)
@@ -82,14 +95,18 @@ router.post('/', authRequired, upload.single('image'), async (req, res) => {
       // Try with task_attachments table (new schema)
       try {
         const { rows } = await pool.query(
-          `INSERT INTO h1todo.task_attachments (file_url, task_id, file_type, file_name, user_id)
-           VALUES ($1, $2, $3, $4, $5)
-           RETURNING id, file_url`,
+          `INSERT INTO h1todo.task_attachments (
+            file_url, task_id, file_type, file_name, file_size, width, height, user_id
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          RETURNING id, file_url`,
           [
             cloudinaryResult.url,
             req.body.taskId || null,
             req.file.mimetype,
             req.file.originalname,
+            cloudinaryResult.bytes || req.file.size,
+            cloudinaryResult.width || null,
+            cloudinaryResult.height || null,
             req.user.userId
           ]
         );
@@ -103,15 +120,19 @@ router.post('/', authRequired, upload.single('image'), async (req, res) => {
       }
     }
     
-    // Delete the temp file
+    // Eyða temp skrá
     fs.unlinkSync(req.file.path);
     console.log('Temporary file deleted');
     
-    // Return success with file URL
+    // Skila árangri
     res.status(201).json({
       message: 'File uploaded successfully',
       fileId: fileId,
-      fileUrl: fileUrl
+      fileUrl: fileUrl,
+      fileName: req.file.originalname,
+      fileSize: cloudinaryResult.bytes || req.file.size,
+      width: cloudinaryResult.width,
+      height: cloudinaryResult.height
     });
   } catch (error) {
     console.error('Error in file upload:', error);
@@ -130,7 +151,7 @@ router.post('/', authRequired, upload.single('image'), async (req, res) => {
   }
 });
 
-// Get attachments for a task
+// Sækja attachments fyrir verkefni
 router.get('/task/:taskId', async (req, res) => {
   try {
     const { taskId } = req.params;
@@ -150,7 +171,7 @@ router.get('/task/:taskId', async (req, res) => {
   }
 });
 
-// Delete an attachment
+// Eyða attachment
 router.delete('/:id', authRequired, async (req, res) => {
   try {
     const { id } = req.params;

@@ -1,3 +1,4 @@
+// Uppfærsluforrit fyrir gagnagrunn - Database migration tool
 import { pool } from './db.js';
 import fs from 'fs';
 import path from 'path';
@@ -14,18 +15,18 @@ async function migrate() {
   console.log(`Using schema file: ${schemaPath}`);
   
   try {
-    // Read SQL file content
+    // Lesa SQL skrá
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
     
-    // Connect to database
+    // Tengjast gagnagrunni
     const client = await pool.connect();
     try {
-      // Execute schema
+      // Keyra schema
       console.log('Executing schema...');
       await client.query(schemaSql);
       console.log('Schema executed successfully');
       
-      // Verify tables exist
+      // Staðfesta að töflur séu til - Verify tables
       console.log('Verifying tables...');
       const tables = ['users', 'tasks', 'categories', 'tags', 'task_tags',
                      'task_history', 'comments', 'task_attachments'];
@@ -57,7 +58,7 @@ async function migrate() {
   }
 }
 
-// Run the migration
+// Keyra uppfærsluna
 migrate()
   .then(() => {
     console.log('Migration script completed');

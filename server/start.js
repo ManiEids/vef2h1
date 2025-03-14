@@ -1,3 +1,4 @@
+// Startup script - Keyrsluforrit fyrir appið
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -6,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('Starting application...');
 
-// First run ensure-users.js to setup default users
+// Keyra fyrst ensure-users.js til að tryggja að notendur séu til
 const ensureUsers = spawn('node', [path.join(__dirname, 'ensure-users.js')]);
 
 ensureUsers.stdout.on('data', (data) => {
@@ -22,7 +23,7 @@ ensureUsers.on('close', (code) => {
   
   if (code === 0) {
     console.log('Starting web server...');
-    // After ensure-users.js completes successfully, start the main server
+    // Þegar búið er að tryggja notendur, þá keyrum við serverinn
     const server = spawn('node', [path.join(__dirname, 'index.js')]);
     
     server.stdout.on('data', (data) => {

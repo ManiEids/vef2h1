@@ -1,3 +1,4 @@
+// Auth module - Auðkenningarkerfi
 import express from 'express';
 import { pool } from './db.js';
 import bcrypt from 'bcrypt';
@@ -7,7 +8,7 @@ import { authRequired, adminRequired } from './middleware.js';
 
 export const router = express.Router();
 
-// Nýskráning notanda
+// Nýskráning notanda - register new user
 router.post(
   '/register',
   [
@@ -15,6 +16,7 @@ router.post(
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
   ],
   async (req, res) => {
+    // Validation check - Villa ef input rangt
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -23,10 +25,10 @@ router.post(
     const { username, password } = req.body;
 
     try {
-      // Hash the password
+      // Hasha lykilorð með bcrypt
       const passwordHash = await bcrypt.hash(password, 10);
 
-      // Insert the new user into the database
+      // Setja notanda í gagnagrunn
       const { rows } = await pool.query(
         'INSERT INTO h1todo.users (username, password_hash, role) VALUES ($1, $2, $3) RETURNING id, username, role',
         [username, passwordHash, 'user']
@@ -34,7 +36,7 @@ router.post(
 
       const user = rows[0];
 
-      // Create JWT
+      // Búa til JWT token
       const token = jwt.sign(
         { userId: user.id, role: user.role },
         process.env.JWT_SECRET || 'secret',
@@ -49,19 +51,19 @@ router.post(
   }
 );
 
-// Login endpoint
+// Innskráning notanda - login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  console.log(`Login attempt for username: ${username}`);
+  console.log(`Login attempt fyrir ${username}`);
   
-  // Simple validation
+  // Einföld validation
   if (!username || !password) {
-    console.log('Login failed: Missing username or password');
+    console.log('Login failed: Vantar username eða password');
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
   try {
-    // Check if user exists
+    // Athuga hvort notandi er til
     const userResult = await pool.query(
       'SELECT * FROM h1todo.users WHERE username = $1',
       [username]
@@ -75,10 +77,10 @@ router.post('/login', async (req, res) => {
     const user = userResult.rows[0];
     console.log(`User found: ${username}, ID: ${user.id}, Role: ${user.role}`);
     
-    // FOR EDUCATIONAL PURPOSES ONLY: Allow hardcoded logins
+    // TMP fyrir verkefni: Leyfa admin/admin og user/user innskráningu
     if ((username === 'admin' && password === 'admin') || 
         (username === 'user' && password === 'user')) {
-      console.log(`Special login granted for ${username}`);
+      console.log(`Sérstök innskráning fyrir ${username}`);
       const token = jwt.sign(
         { userId: user.id, role: user.role },
         process.env.JWT_SECRET || 'secret',
@@ -88,7 +90,7 @@ router.post('/login', async (req, res) => {
       return res.json({ token });
     }
 
-    // Compare passwords
+    // Bera saman lykilorð með bcrypt
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -109,7 +111,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get authenticated user
+// Sækja upplýsingar um innskráðan notanda - get current user
 router.get('/me', authRequired, async (req, res) => {
   try {
     const { rows } = await pool.query(
@@ -128,7 +130,7 @@ router.get('/me', authRequired, async (req, res) => {
   }
 });
 
-// Get all users (admin only)
+// Sækja fjölda notenda - get user count
 router.get('/users', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT COUNT(*) FROM h1todo.users');

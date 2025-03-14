@@ -5,7 +5,7 @@ import { body, validationResult, param, query } from 'express-validator';
 
 export const router = express.Router();
 
-// Get all tasks with pagination and filtering
+// Sækja öll verkefni með pagination og filtering
 router.get('/', [
   query('page').optional().isInt({ min: 1 }).toInt(),
   query('limit').optional().isInt({ min: 1, max: 50 }).toInt(),
@@ -15,6 +15,7 @@ router.get('/', [
   query('search').optional().isString().trim(),
   query('sort').optional().isIn(['newest', 'oldest', 'priority', 'dueDate']).trim()
 ], async (req, res) => {
+  // Validation check - skoða errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -22,18 +23,18 @@ router.get('/', [
 
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
-  const offset = (page - 1) * limit;
+  const offset = (page - 1) * limit; // Reikna offset fyrir SQL
 
   try {
-    console.log('GET /tasks - Attempting to fetch tasks');
-    console.log(`Database URL: ${process.env.DATABASE_URL ? 'is set (length: ' + process.env.DATABASE_URL.length + ')' : 'is NOT set!'}`);
+    console.log('GET /tasks - Sæki verkefni');
+    console.log(`Database URL: ${process.env.DATABASE_URL ? 'er til' : 'vantar!'}`);
     
-    // Build query conditions
+    // Build query conditions - Búa til skilyrði fyrir fyrirspurn
     let conditions = [];
     let params = [];
     let paramCounter = 1;
 
-    // Filter by completion status
+    // Filter eftir completion status
     if (req.query.completed !== undefined) {
       conditions.push(`t.completed = $${paramCounter++}`);
       params.push(req.query.completed);
@@ -88,7 +89,7 @@ router.get('/', [
       }
     }
 
-    // Get total count for pagination
+    // Sækja fjölda verkefna fyrir pagination
     const countQuery = `
       SELECT COUNT(*) 
       FROM h1todo.tasks t
@@ -99,7 +100,7 @@ router.get('/', [
     const total = parseInt(countResult.rows[0].count, 10);
     const totalPages = Math.ceil(total / limit);
 
-    // Get tasks with basic details
+    // Sækja verkefni með grunnupplýsingum
     const tasksQuery = `
       SELECT t.*, c.name AS category_name
       FROM h1todo.tasks t
@@ -143,7 +144,7 @@ router.get('/', [
         });
       });
 
-      // Add tags to each task
+      // Tengja tags við verkefni
       tasks.forEach(task => {
         task.tags = taskTags[task.id] || [];
       });
@@ -185,7 +186,7 @@ router.get('/', [
   }
 });
 
-// Get a single task by ID
+// Sækja eitt verkefni eftir ID
 router.get('/:id', [param('id').isInt().toInt()], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -242,7 +243,7 @@ router.get('/:id', [param('id').isInt().toInt()], async (req, res) => {
   }
 });
 
-// Create a new task
+// Búa til nýtt verkefni - þarf að vera innskráður
 router.post('/', authRequired, [
   body('title').isLength({ min: 3 }).withMessage('Title must be at least 3 characters long'),
   body('description').optional().isString(),
@@ -304,7 +305,7 @@ router.post('/', authRequired, [
   }
 });
 
-// Update a task
+// Uppfæra verkefni - þarf að vera innskráður + vera eigandi
 router.put('/:id', authRequired, [
   param('id').isInt().toInt(),
   body('title').optional().isLength({ min: 3 }),
@@ -421,7 +422,7 @@ router.put('/:id', authRequired, [
   }
 });
 
-// Delete a task
+// Eyða verkefni - þarf að vera innskráður + eigandi eða admin
 router.delete('/:id', authRequired, [param('id').isInt().toInt()], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -476,7 +477,7 @@ router.delete('/:id', authRequired, [param('id').isInt().toInt()], async (req, r
   }
 });
 
-// Get all categories
+// Sækja alla flokka - allir geta sótt
 router.get('/categories/all', async (req, res) => {
   try {
     const { rows } = await pool.query(`
@@ -492,7 +493,7 @@ router.get('/categories/all', async (req, res) => {
   }
 });
 
-// Get all tags
+// Sækja öll tags - allir geta sótt
 router.get('/tags/all', async (req, res) => {
   try {
     const { rows } = await pool.query(`
@@ -508,9 +509,9 @@ router.get('/tags/all', async (req, res) => {
   }
 });
 
-// Helper function to get a task with all its relations
+// Hjálparfall til að sækja verkefni með öllum tengdum gögnum
 async function getTaskWithRelations(taskId) {
-  // Get task with basic details
+  // Sæki verkefni með grunnupplýsingum
   const { rows: tasks } = await pool.query(`
     SELECT t.*, c.name AS category_name
     FROM h1todo.tasks t

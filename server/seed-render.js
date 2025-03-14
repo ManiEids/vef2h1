@@ -1,3 +1,4 @@
+// Seed script fyrir Render - Setja upp grunn gögn í production
 import { pool } from './db.js';
 import fs from 'fs';
 import path from 'path';
@@ -7,7 +8,7 @@ import bcrypt from 'bcrypt';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const schemaPath = path.join(__dirname, 'database.sql');
 
-// Password hash for admin user (password: admin)
+// Hash fyrir admin notanda (lykilorð: admin)
 const ADMIN_HASH = '$2b$10$7TxahHgzQi2MvV5ktj5qkO7PQPkJImjcKuIci96bA2pZVC4CsvKju';
 
 async function seedRender() {
@@ -15,23 +16,23 @@ async function seedRender() {
   let client;
 
   try {
-    // Read SQL file content
+    // Lesa SQL skrá
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
     
-    // Connect to database
+    // Tengja við gagnagrunn
     client = await pool.connect();
     
-    // Create schema if not exists
+    // Búa til schema ef það er ekki til
     await client.query('CREATE SCHEMA IF NOT EXISTS h1todo');
     await client.query('SET search_path TO h1todo, public');
     
     try {
-      // Execute schema
+      // Keyra schema
       console.log('Executing schema...');
       await client.query(schemaSql);
       console.log('Schema executed successfully');
       
-      // Insert admin user if not exists
+      // Setja inn admin notanda ef hann er ekki til
       await client.query(`
         INSERT INTO h1todo.users (username, password_hash, role, email)
         VALUES ('admin', $1, 'admin', 'admin@example.com')
@@ -39,7 +40,7 @@ async function seedRender() {
       `, [ADMIN_HASH]);
       console.log('Admin user created or already exists');
       
-      // Insert basic categories if not exist
+      // Setja inn grunnflokka ef þeir eru ekki til
       const categories = [
         ['Vinna', 'Work-related tasks', '#0275d8'],
         ['Persónulegt', 'Personal tasks', '#5cb85c'],
@@ -57,7 +58,7 @@ async function seedRender() {
       }
       console.log('Basic categories created');
       
-      // Insert basic tags if not exist
+      // Setja inn grunn tags ef þau eru ekki til
       const tags = [
         ['Mikilvægt', '#dc3545'],
         ['Fundur', '#007bff'],
@@ -75,7 +76,7 @@ async function seedRender() {
       }
       console.log('Basic tags created');
       
-      // Create sample tasks if there are none
+      // Búa til sýnishorn verkefni ef þau eru ekki til
       const { rows: taskCount } = await client.query('SELECT COUNT(*) FROM h1todo.tasks');
       if (parseInt(taskCount[0].count) === 0) {
         await client.query(`
@@ -101,7 +102,7 @@ async function seedRender() {
   }
 }
 
-// Run the seed
+// Keyra seed forritið
 seedRender()
   .then(() => {
     console.log('Render seed script completed');
