@@ -77,6 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify({ username, password })
       });
   
+      // Check if the response is ok before parsing JSON
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Innskráning mistókst');
+      }
+  
       const data = await response.json();
       if (data.token) {
         token = data.token;
@@ -84,12 +90,29 @@ document.addEventListener('DOMContentLoaded', function() {
         checkAuthStatus();
         loadTasks(); // Reload tasks after login
         alert('Innskráning tókst!');
+        
+        // Get user info if possible
+        try {
+          const userResponse = await fetch(`${API_URL}/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            elements.currentUser.textContent = `Innskráður sem: ${userData.username}`;
+          }
+        } catch (userError) {
+          console.error('Error fetching user data:', userError);
+          elements.currentUser.textContent = 'Innskráður';
+        }
       } else {
-        alert('Innskráning mistókst: ' + (data.error || 'Óþekkt villa'));
+        throw new Error('Enginn token í svari');
       }
     } catch (error) {
       console.error('Villa við innskráningu:', error);
-      alert('Villa kom upp við innskráningu');
+      alert(error.message || 'Villa kom upp við innskráningu');
     }
   }
   

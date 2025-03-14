@@ -79,3 +79,16 @@ async function createTask() {
     getTasks();
   }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Default login values for educational purposes
+  const usernameField = document.getElementById('username');
+  const passwordField = document.getElementById('password');
+  
+  if (usernameField && passwordField) {
+    usernameField.value = 'admin';
+    passwordField.value = 'admin';
+  }
+  
+  // Rest of your initialization code
+});
