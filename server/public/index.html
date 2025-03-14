@@ -52,7 +52,7 @@
           <input type="text" id="title" name="title" required>
           <label for="description">Lýsing:</label>
           <textarea id="description" name="description"></textarea>
-          <button type="submit">Bæta við</button>
+          <button type="submit" onclick="createTask()">Bæta við</button>
         </form>
       </section>
 
@@ -60,13 +60,20 @@
       <section class="tasks-list">
         <h2>Verkefni þín</h2>
         <div id="loading-state" class="hidden">Sæki verkefni...</div>
-        <div id="error-state" class="hidden">Villa kom upp við að sækja verkefni. <button id="retry-button">Reyna aftur</button></div>
+        <div id="error-state" class="hidden">Villa kom upp við að sækja verkefni. <button id="retry-button" onclick="loadTasks()">Reyna aftur</button></div>
         <div id="empty-state" class="hidden">Engin verkefni til að sýna.</div>
         <ul id="tasks-list"></ul>
       </section>
     </main>
+
+    <footer>
+      <div id="db-info">
+        <p>Notendur: <span id="user-count">0</span></p>
+        <p>Verkefni: <span id="task-count">0</span></p>
+      </div>
+    </footer>
   </div>
 
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

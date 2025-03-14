@@ -1,0 +1,19 @@
+{
+  "tasks": [
+    {
+      "title": "Learn JavaScript",
+      "description": "Study JavaScript fundamentals",
+      "completed": false
+    },
+    {
+      "title": "Build a Todo App",
+      "description": "Create a basic todo application",
+      "completed": false
+    },
+    {
+      "title": "Deploy to Render",
+      "description": "Deploy the todo application to Render",
+      "completed": false
+    }
+  ]
+}

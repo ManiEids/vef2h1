@@ -2,40 +2,53 @@ import express from 'express';
 import { pool } from './db.js';
 import { authRequired, adminRequired } from './middleware.js';
 import { body, validationResult, param, query } from 'express-validator';
+import fs from 'fs';
 
 export const router = express.Router();
+
+async function loadInitialTasks() {
+  try {
+    const { rows } = await pool.query('SELECT COUNT(*) FROM tasks');
+    const taskCount = parseInt(rows[0].count, 10);
+
+    if (taskCount === 0) {
+      console.log('Loading initial tasks from data.json');
+      const rawData = fs.readFileSync('public/data/data.json');
+      const data = JSON.parse(rawData);
+
+      if (data.tasks && Array.isArray(data.tasks)) {
+        for (const task of data.tasks) {
+          await pool.query(
+            `INSERT INTO tasks (title, description, user_id)
+             VALUES ($1, $2, $3) RETURNING *`,
+            [task.title, task.description, 1] // Assuming user_id 1 is admin
+          );
+        }
+        console.log('Initial tasks loaded successfully');
+      } else {
+        console.warn('No tasks found in data.json');
+      }
+    } else {
+      console.log('Tasks already exist in the database');
+    }
+  } catch (err) {
+    console.error('Error loading initial tasks:', err);
+  }
+}
+
+loadInitialTasks();
 
 // Sækja verkefni með síðuskiptingu
 router.get(
   '/',
-  [
-    query('page').optional().isInt({ min: 1 }).toInt().default(1),
-    query('limit').optional().isInt({ min: 1, max: 50 }).toInt().default(10),
-  ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const page = req.query.page;
-    const limit = req.query.limit;
-    const offset = (page - 1) * limit;
-
     try {
-      const { rows, rowCount } = await pool.query(
-        'SELECT * FROM tasks ORDER BY id DESC LIMIT $1 OFFSET $2',
-        [limit, offset]
+      const { rows } = await pool.query(
+        'SELECT * FROM tasks ORDER BY id DESC'
       );
-
-      const totalPages = Math.ceil(rowCount / limit);
 
       res.json({
         tasks: rows,
-        page,
-        limit,
-        totalPages,
-        totalTasks: rowCount,
       });
     } catch (err) {
       console.error(err);

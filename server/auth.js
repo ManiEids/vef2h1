@@ -82,3 +82,15 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ error: 'Server error' });
   }
 });
+
+// Sækja fjölda notenda
+router.get('/users', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT COUNT(*) FROM users');
+    const count = parseInt(rows[0].count, 10);
+    return res.json({ count });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});

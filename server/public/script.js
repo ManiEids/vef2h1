@@ -16,14 +16,16 @@ const elements = {
     allCount: document.getElementById('all-count'),
     completedCount: document.getElementById('completed-count'),
     loginForm: document.getElementById('login-form'),
-    userInfo: document.getElementById('user-info'),
+    userInfo: document.getElementById('userInfo'),
     username: document.getElementById('username'),
     password: document.getElementById('password'),
     loginButton: document.getElementById('login-button'),
     logoutButton: document.getElementById('logout-button'),
-    taskDescription: document.getElementById('task-description'),
+    taskDescription: document.getElementById('taskDescription'),
     filterButtons: document.querySelectorAll('.filter-btn'),
-    taskContainer: document.getElementById('task-container')
+    taskContainer: document.getElementById('taskContainer'),
+    userCount: document.getElementById('user-count'),
+    taskCount: document.getElementById('task-count')
 };
 
 const API_URL = 'https://vef2hop1manisolo.onrender.com';
@@ -154,6 +156,22 @@ function renderTasks(tasks) {
     });
 }
 
+async function getDatabaseInfo() {
+    try {
+        const usersResponse = await fetch(`${API_URL}/auth/users`);
+        const usersData = await usersResponse.json();
+        elements.userCount.textContent = usersData.count;
+
+        const tasksResponse = await fetch(`${API_URL}/tasks`);
+        const tasksData = await tasksResponse.json();
+        elements.taskCount.textContent = tasksData.tasks.length;
+    } catch (error) {
+        console.error('Error fetching database info:', error);
+        elements.userCount.textContent = 'Error';
+        elements.taskCount.textContent = 'Error';
+    }
+}
+
 // Set up event listeners
 function setupEventListeners() {
     elements.loginButton.addEventListener('click', handleLogin);
@@ -164,10 +182,11 @@ function setupEventListeners() {
 
 // Initialize the app
 function initApp() {
-    API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://vef2hop1manisolo.onrender.com';
+    API_URL = window.location.hostname === 'http://localhost:3000' ? 'http://localhost:3000' : 'https://vef2hop1manisolo.onrender.com';
     checkAuthStatus();
     setupEventListeners();
     loadTasks();
+    getDatabaseInfo();
 }
 
 // Run the app when the page is ready

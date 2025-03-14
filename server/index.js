@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { router as tasksRouter } from './tasks.js';
 import { router as authRouter } from './auth.js';
 import { router as uploadRouter } from './upload.js';
+import { pool } from './db.js'; // Import the database pool
 
 dotenv.config();
 

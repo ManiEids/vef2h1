@@ -107,3 +107,11 @@ VALUES
   ('Meeting'),
   ('Deadline')
 ON CONFLICT (name) DO NOTHING;
+
+-- Insert some sample tasks
+INSERT INTO tasks (title, description, user_id)
+VALUES
+  ('Learn JavaScript', 'Study JavaScript fundamentals', 1),
+  ('Build a Todo App', 'Create a basic todo application', 1),
+  ('Deploy to Render', 'Deploy the todo application to Render', 1)
+ON CONFLICT (title) DO NOTHING;
