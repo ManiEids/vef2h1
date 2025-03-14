@@ -10,12 +10,16 @@
   <div class="container">
     <header>
       <h1>Minimal Todo</h1>
+      <!-- Innskráningarformið -->
       <div class="auth-container">
         <div id="login-form">
-          <input type="text" id="username" placeholder="Notandanafn">
-          <input type="password" id="password" placeholder="Lykilorð">
+          <label for="username">Notandanafn:</label>
+          <input type="text" id="username" name="username">
+          <label for="password">Lykilorð:</label>
+          <input type="password" id="password" name="password">
           <button id="login-button">Innskrá</button>
         </div>
+        <!-- Notendaupplýsingar -->
         <div id="user-info" class="hidden">
           <span id="current-user"></span>
           <button id="logout-button">Útskrá</button>
@@ -24,31 +28,45 @@
     </header>
 
     <main>
+      <!-- Valmynd -->
+      <nav class="navigation">
+        <ul>
+          <li><a href="#" data-filter="all" id="all-tasks">Verkefni (<span id="all-count">0</span>)</a></li>
+          <li><a href="#" data-filter="completed" id="completed-tasks">Kláruð verkefni (<span id="completed-count">0</span>)</a></li>
+          <li>
+            Flokkar
+            <ul id="categories-list"></ul>
+          </li>
+          <li>
+            Tags
+            <ul id="tags-list"></ul>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Form til að búa til verkefni -->
       <section class="task-input">
         <h2>Nýtt verkefni</h2>
         <form id="task-form">
-          <input type="text" id="task-title" placeholder="Titill verkefnis" required>
-          <textarea id="task-description" placeholder="Lýsing (valfrjálst)"></textarea>
+          <label for="title">Titill:</label>
+          <input type="text" id="title" name="title" required>
+          <label for="description">Lýsing:</label>
+          <textarea id="description" name="description"></textarea>
           <button type="submit">Bæta við</button>
         </form>
       </section>
 
-      <section class="task-filters">
-        <h2>Sía verkefni</h2>
-        <div class="filter-options">
-          <button class="filter-btn active" data-filter="all">Ólokin</button>
-          <button class="filter-btn" data-filter="completed">Lokið</button>
-        </div>
-      </section>
-
+      <!-- Verkefnalisti -->
       <section class="tasks-list">
         <h2>Verkefni þín</h2>
-        <div id="loading" class="loading">Hleð verkefnum...</div>
-        <div id="task-container"></div>
+        <div id="loading-state" class="hidden">Sæki verkefni...</div>
+        <div id="error-state" class="hidden">Villa kom upp við að sækja verkefni. <button id="retry-button">Reyna aftur</button></div>
+        <div id="empty-state" class="hidden">Engin verkefni til að sýna.</div>
+        <ul id="tasks-list"></ul>
       </section>
     </main>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
