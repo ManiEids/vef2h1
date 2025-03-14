@@ -8,7 +8,20 @@ export const router = express.Router();
 
 async function loadInitialTasks() {
   try {
-    const { rows } = await pool.query('SELECT COUNT(*) FROM tasks');
+    // Check if the tasks table exists
+    try {
+      await pool.query('SELECT 1 FROM h1todo.tasks LIMIT 1');
+    } catch (tableErr) {
+      // If the table doesn't exist, create it
+      console.log('Tasks table does not exist, creating it...');
+      // Execute the database.sql script to create the tables
+      const fs = require('fs');
+      const databaseSql = fs.readFileSync('database.sql').toString();
+      await pool.query(databaseSql);
+      console.log('Tasks table created successfully.');
+    }
+
+    const { rows } = await pool.query('SELECT COUNT(*) FROM h1todo.tasks');
     const taskCount = parseInt(rows[0].count, 10);
 
     if (taskCount === 0) {
@@ -19,7 +32,7 @@ async function loadInitialTasks() {
       if (data.tasks && Array.isArray(data.tasks)) {
         for (const task of data.tasks) {
           await pool.query(
-            `INSERT INTO tasks (title, description, user_id)
+            `INSERT INTO h1todo.tasks (title, description, user_id)
              VALUES ($1, $2, $3) RETURNING *`,
             [task.title, task.description, 1] // Assuming user_id 1 is admin
           );
