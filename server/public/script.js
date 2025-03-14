@@ -175,12 +175,22 @@ async function getDatabaseInfo() {
 async function checkDatabaseStatus() {
   try {
     const response = await fetch(`${API_URL}/api/db-status`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+    
     const data = await response.json();
+    console.log('Database status response:', data);
 
     const statusElement = document.getElementById('db-connection-status');
     const userCount = document.getElementById('db-user-count');
     const taskCount = document.getElementById('db-task-count');
     const lastChecked = document.getElementById('db-last-checked');
+    
+    // Also update the footer counters
+    const footerUserCount = document.getElementById('user-count');
+    const footerTaskCount = document.getElementById('task-count');
 
     if (data.connected) {
       statusElement.textContent = 'Connected';
@@ -188,11 +198,15 @@ async function checkDatabaseStatus() {
       userCount.textContent = data.stats.users;
       taskCount.textContent = data.stats.tasks;
       lastChecked.textContent = new Date().toLocaleTimeString();
+      
+      // Update footer counters too
+      if (footerUserCount) footerUserCount.textContent = data.stats.users;
+      if (footerTaskCount) footerTaskCount.textContent = data.stats.tasks;
     } else {
       statusElement.textContent = 'Disconnected';
       statusElement.className = 'disconnected';
-      userCount.textContent = '-';
-      taskCount.textContent = '-';
+      userCount.textContent = 'Error';
+      taskCount.textContent = 'Error';
       lastChecked.textContent = new Date().toLocaleTimeString();
     }
   } catch (error) {
@@ -213,17 +227,24 @@ function setupEventListeners() {
 
 // Initialize the app
 function initApp() {
-    API_URL = window.location.hostname === 'http://localhost:3000' ? 'http://localhost:3000' : 'https://vef2hop1manisolo.onrender.com';
-    checkAuthStatus();
-    setupEventListeners();
-    loadTasks();
-    getDatabaseInfo();
-    
-    // Check database status when page loads
-    checkDatabaseStatus();
-    
-    // Periodically check database status (every 60 seconds)
-    setInterval(checkDatabaseStatus, 60000);
+  // Define API_URL based on environment
+  if (window.location.hostname === 'localhost') {
+    API_URL = 'http://localhost:3000';
+  } else {
+    API_URL = 'https://vef2hop1manisolo.onrender.com';
+  }
+  
+  console.log('Using API URL:', API_URL);
+  
+  checkAuthStatus();
+  setupEventListeners();
+  loadTasks();
+  
+  // Check database status immediately
+  checkDatabaseStatus();
+  
+  // Then check periodically
+  setInterval(checkDatabaseStatus, 30000); // Check every 30 seconds
 }
 
 // Run the app when the page is ready

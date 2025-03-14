@@ -40,14 +40,17 @@ app.get('/api/db-status', async (req, res) => {
   try {
     // Test database connection
     const connectionTest = await pool.query('SELECT NOW() as now');
+    console.log('Database connection successful');
 
-    // Get user count
+    // Get user count from h1todo.users schema
     const usersResult = await pool.query('SELECT COUNT(*) FROM h1todo.users');
     const userCount = parseInt(usersResult.rows[0].count, 10);
+    console.log(`User count: ${userCount}`);
 
     // Get tasks count
     const tasksResult = await pool.query('SELECT COUNT(*) FROM h1todo.tasks');
     const taskCount = parseInt(tasksResult.rows[0].count, 10);
+    console.log(`Task count: ${taskCount}`);
 
     // Return status and counts
     res.json({
@@ -60,7 +63,7 @@ app.get('/api/db-status', async (req, res) => {
     });
   } catch (err) {
     console.error('Database connection error:', err);
-    res.json({
+    res.status(500).json({
       connected: false,
       error: err.message
     });
@@ -72,20 +75,22 @@ app.use('/tasks', tasksRouter);
 app.use('/auth', authRouter);
 app.use('/upload', uploadRouter);
 
+// 404 villumeðhöndlun fyrir API leiðir
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
 // Beina öllum öðrum beiðnum á index.html (fyrir SPA)
 app.get('*', (req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// 404 villumeðhöndlun fyrir API leiðir
-app.use('/api/*', (req, res, next) => {
-  res.status(404).json({ error: 'Not Found' });
-});
-
 // Almenn villumeðhöndlun
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
+  if (!res.headersSent) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // Ræsa þjón

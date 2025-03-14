@@ -89,5 +89,14 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    // Simple error handler to catch any script loading issues
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error('Script error:', message, source, error);
+      document.getElementById('db-connection-status').textContent = 'Script error: ' + message;
+      document.getElementById('db-connection-status').className = 'disconnected';
+      return true;
+    };
+  </script>
 </body>
 </html>
