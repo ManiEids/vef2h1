@@ -86,7 +86,7 @@ router.post('/login', async (req, res) => {
 // Sækja fjölda notenda
 router.get('/users', async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT COUNT(*) FROM users');
+    const { rows } = await pool.query('SELECT COUNT(*) FROM h1todo.users');
     const count = parseInt(rows[0].count, 10);
     return res.json({ count });
   } catch (err) {
