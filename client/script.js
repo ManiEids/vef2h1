@@ -1,5 +1,5 @@
 // Fyrir þróun, notað localhost
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://vef2hop1manisolo.onrender.com';
 
 // Fyrir framleiðslu, notaðu Render vefþjóninn
 // const API_URL = 'https://your-backend-name.onrender.com';
