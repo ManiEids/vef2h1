@@ -2,11 +2,11 @@ import express from 'express';
 import { pool } from './db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { body, validationResult } from 'express-validator'; // Import express-validator
+import { body, validationResult } from 'express-validator';
 
 export const router = express.Router();
 
-// POST /auth/register
+// Nýskráning notanda
 router.post(
   '/register',
   [
@@ -48,7 +48,7 @@ router.post(
   }
 );
 
-// POST /auth/login
+// Innskráning notanda og útgáfa JWT aðgangstókens
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -56,18 +56,20 @@ router.post('/login', async (req, res) => {
   }
 
   try {
+    // Finna notanda í gagnagrunni
     const { rows } = await pool.query('SELECT * FROM users WHERE username=$1', [username]);
     const user = rows[0];
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Staðfesta lykilorð
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Create JWT
+    // Búa til JWT tóken
     const token = jwt.sign(
       { userId: user.id, role: user.role },
       process.env.JWT_SECRET || 'secret',

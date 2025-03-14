@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker';
 
 async function seedDatabase() {
   try {
-    // 1. Create Admin User
+    // 1. Búa til admin notanda
     const password = 'adminpassword';
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -15,7 +15,7 @@ async function seedDatabase() {
 
     const adminId = adminUser.rows[0].id;
 
-    // 2. Create Categories
+    // 2. Búa til flokka
     const categories = [];
     for (let i = 0; i < 5; i++) {
       const categoryName = faker.lorem.word();
@@ -27,7 +27,7 @@ async function seedDatabase() {
       categories.push(category.rows[0]);
     }
 
-    // 3. Create Tags
+    // 3. Búa til merki
     const tags = [];
     for (let i = 0; i < 5; i++) {
       const tagName = faker.lorem.word();
@@ -38,7 +38,7 @@ async function seedDatabase() {
       tags.push(tag.rows[0]);
     }
 
-    // 4. Create Regular Users
+    // 4. Búa til venjulega notendur
     const users = [adminUser.rows[0]]; // Start with admin user
     for (let i = 0; i < 10; i++) {
       const username = faker.internet.userName();
@@ -52,7 +52,7 @@ async function seedDatabase() {
       users.push(user.rows[0]);
     }
 
-    // 5. Create Tasks
+    // 5. Búa til verkefni
     for (let i = 0; i < 50; i++) {
       const title = faker.lorem.sentence();
       const description = faker.lorem.paragraph();
@@ -85,8 +85,8 @@ async function seedDatabase() {
   }
 }
 
+// Keyra seeding og loka tengingu við gagnagrunn þegar það er klárað
 seedDatabase().then(() => {
-  // Close the pool only after the seeding is complete
   setTimeout(() => {
     pool.end();
   }, 1000);

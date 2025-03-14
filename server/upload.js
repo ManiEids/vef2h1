@@ -3,8 +3,7 @@ import { authRequired } from './middleware.js';
 
 export const router = express.Router();
 
-// POST /upload - Simplified version (stub endpoint)
+// Einfaldur upload endapunktur (verður útfært síðar)
 router.post('/', authRequired, async (req, res) => {
-  // Return a simple success response for now
   res.json({ message: 'File upload functionality will be implemented later' });
 });

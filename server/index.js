@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // parse JSON bodies
 
-// Simple route for sanity check
+// Einföld leið til að athuga hvort þjónninn sé virkur
 app.get('/', (req, res) => {
   res.json({
     message: 'Hello from minimal API',
@@ -20,28 +20,27 @@ app.get('/', (req, res) => {
       tasks: '/tasks',
       auth: '/auth',
       upload: '/upload',
-      // Add other routes as you create them
     },
   });
 });
 
-// Attach routes
+// Tengja viðeigandi router
 app.use('/tasks', tasksRouter);
 app.use('/auth', authRouter);
 app.use('/upload', uploadRouter);
 
-// 404 Route
+// 404 villumeðhöndlun
 app.use((req, res, next) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// Error handling middleware
+// Almenn villumeðhöndlun
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// Start server
+// Ræsa þjón
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

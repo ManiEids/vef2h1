@@ -5,7 +5,7 @@ import { body, validationResult, param, query } from 'express-validator';
 
 export const router = express.Router();
 
-// GET /tasks (with pagination)
+// Sækja verkefni með síðuskiptingu
 router.get(
   '/',
   [
@@ -44,7 +44,7 @@ router.get(
   }
 );
 
-// GET /tasks/:id
+// Sækja eitt verkefni eftir auðkenni
 router.get(
   '/:id',
   [param('id').isInt().toInt()],
@@ -71,7 +71,7 @@ router.get(
   }
 );
 
-// POST /tasks (requires auth)
+// Búa til nýtt verkefni (krefst innskráningar)
 router.post(
   '/',
   authRequired,
@@ -101,7 +101,7 @@ router.post(
   }
 );
 
-// PUT /tasks/:id (admin only)
+// Uppfæra verkefni (aðeins stjórnandi)
 router.put(
   '/:id',
   authRequired,
@@ -139,7 +139,7 @@ router.put(
   }
 );
 
-// DELETE /tasks/:id (admin only)
+// Eyða verkefni (aðeins stjórnandi)
 router.delete(
   '/:id',
   authRequired,

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// Middleware til að athuga hvort notandi sé innskráður
 export function authRequired(req, res, next) {
   const header = req.headers.authorization || '';
   const [type, token] = header.split(' ');
@@ -17,6 +18,7 @@ export function authRequired(req, res, next) {
   }
 }
 
+// Middleware til að athuga hvort notandi sé stjórnandi
 export function adminRequired(req, res, next) {
   if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Admin only' });
