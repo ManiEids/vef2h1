@@ -1,6 +1,4 @@
-// Main app file - handles UI interaction and rendering
-
-// DOM Elements
+// Main app 
 document.addEventListener('DOMContentLoaded', function() {
   const elements = {
     tasksList: document.getElementById('tasks-list'),
@@ -41,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     taskImage: document.getElementById('task-image')
   };
 
-  // Use let instead of const for API_URL since we're reassigning it
+  // nota let
   let API_URL;
   
   if (window.location.hostname === 'localhost') {
@@ -65,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let pageSize = 10;
   let totalPages = 1;
   
-  // Check authentication status
+  // Checka status
   function checkAuthStatus() {
     if (token) {
       elements.loginForm.classList.add('hidden');
